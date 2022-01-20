@@ -1,12 +1,15 @@
 package io.security.coreSpringSecurity.security.config;
 
+import io.security.coreSpringSecurity.security.filter.AjaxLoginProcessingFilter;
 import io.security.coreSpringSecurity.security.handler.CustomAccessDeniedHandler;
 import io.security.coreSpringSecurity.security.provider.CustomAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,10 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.cert.Extension;
 
 @Configuration
+@Order(1)
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -42,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return accessDeniedHandler;
     }
 
+
     /*
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -55,6 +61,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     */
     //@Autowired
     //private UserDetailsService userDetailsService;
+
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -99,7 +107,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(customAuthenticationSuccessHandler)
                 .failureHandler(customAuthenticationFailureHandler)
                 .permitAll() //Login같은 경우 검증 받지 않아도 접근이 되야하므로 permitAll 설정한다.
-        ;
+                ;
+
+
     }
 
 }
