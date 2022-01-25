@@ -9,6 +9,7 @@ import io.security.coreSpringSecurity.security.handler.FormAccessDeniedHandler;
 import io.security.coreSpringSecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import io.security.coreSpringSecurity.security.provider.AjaxAuthenticationProvider;
 import io.security.coreSpringSecurity.security.provider.FormAuthenticationProvider;
+import io.security.coreSpringSecurity.security.voter.IpAddressVoter;
 import io.security.coreSpringSecurity.service.SecurityResourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -45,6 +48,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @Slf4j
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true) //메소드 권한설정을 해주는 어노테이션
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -176,6 +180,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private List<AccessDecisionVoter<?>> getAccessDecistionVoters() {
         List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
+        //먼저 실행되야 한다. //IP가 허용되지 않을경우 인증을 할 필요가 없기 때문
+        accessDecisionVoters.add(new IpAddressVoter(securityResourceService));
         accessDecisionVoters.add(roleVoter());
         return accessDecisionVoters;
     }
