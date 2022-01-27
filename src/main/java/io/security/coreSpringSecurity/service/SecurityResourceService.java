@@ -38,7 +38,35 @@ public class SecurityResourceService {
         return result;
     }
 
+    public LinkedHashMap<String, List<ConfigAttribute>> getMethodResourceList(){
+        LinkedHashMap<String, List<ConfigAttribute>> result = new LinkedHashMap<>();
+        List<Resources> resourcesList = resourcesRepository.findAllMethodResources(); //Method 방식 자원을 가지고 온다.
+        resourcesList.forEach(re -> {
+            List<ConfigAttribute> configAttributes = new ArrayList<>();
+            //하나의 자원에 해당되는 모든Role
+            re.getRoleSet().forEach(role -> {
+                configAttributes.add(new SecurityConfig(role.getRoleName()));
+            });
+            result.put(re.getResourceName(), configAttributes);
+        });
+        return result;
+    }
+    public LinkedHashMap<String, List<ConfigAttribute>> getPointcutResourceList() {
+        LinkedHashMap<String, List<ConfigAttribute>> result = new LinkedHashMap<>();
+        List<Resources> resourcesList = resourcesRepository.findAllPointcutResources(); //Pointcut자원을 가지고 온다
+        resourcesList.forEach(re -> {
+            List<ConfigAttribute> configAttributes = new ArrayList<>();
+            //하나의 자원에 해당되는 모든Role
+            re.getRoleSet().forEach(role -> {
+                configAttributes.add(new SecurityConfig(role.getRoleName()));
+            });
+            result.put(re.getResourceName(), configAttributes);
+        });
+        return result;
+    }
     public List<String> getAccessIpList() {
         return accessIpRepository.findAll().stream().map(accessIp -> accessIp.getIpAddress()).collect(Collectors.toList());
     }
+
+ 
 }

@@ -6,6 +6,7 @@ import io.security.coreSpringSecurity.domain.entity.Resources;
 import io.security.coreSpringSecurity.domain.entity.Role;
 import io.security.coreSpringSecurity.repository.RoleRepository;
 import io.security.coreSpringSecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
+import io.security.coreSpringSecurity.service.MethodSecurityService;
 import io.security.coreSpringSecurity.service.ResourcesService;
 import io.security.coreSpringSecurity.service.RoleService;
 import org.modelmapper.ModelMapper;
@@ -35,6 +36,9 @@ public class ResourcesController {
 	@Autowired
 	private UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
 
+	@Autowired
+	private MethodSecurityService methodSecurityService;
+
 	@GetMapping(value="/admin/resources")
 	public String getResources(Model model) throws Exception {
 
@@ -55,7 +59,13 @@ public class ResourcesController {
 		resources.setRoleSet(roles);
 
 		resourcesService.createResources(resources);
-		urlFilterInvocationSecurityMetadataSource.reload(); //삭제 수정시 reload
+		if("url".equals(resourcesDto.getResourceType())){
+			urlFilterInvocationSecurityMetadataSource.reload(); //삭제 수정시 reload
+		}else{
+			methodSecurityService.addMethodSecured(resourcesDto.getResourceName(), resourcesDto.getRoleName());
+		}
+
+
 		return "redirect:/admin/resources";
 	}
 
@@ -93,7 +103,11 @@ public class ResourcesController {
 
 		Resources resources = resourcesService.getResources(Long.valueOf(id));
 		resourcesService.deleteResources(Long.valueOf(id));
-		urlFilterInvocationSecurityMetadataSource.reload();
+		if("url".equals(resources.getResourceType())){
+			urlFilterInvocationSecurityMetadataSource.reload(); //삭제 수정시 reload
+		}else{
+			methodSecurityService.removeMethodSecured(resources.getResourceName());
+		}
 		return "redirect:/admin/resources";
 	}
 }

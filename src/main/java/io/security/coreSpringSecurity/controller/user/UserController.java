@@ -61,4 +61,9 @@ public class UserController {
 
 		return "user/mypage";
 	}
+	@GetMapping(value="/order")
+	public String order() throws Exception {
+		userService.order();
+		return "user/mypage";
+	}
 }
